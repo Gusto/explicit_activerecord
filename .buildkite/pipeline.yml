@@ -1,0 +1,7 @@
+steps:
+  - name: ':rspec: RSpec'
+    command: test.sh
+    timeout_in_minutes: 10
+    env:
+      BUILDKITE_DOCKER: 'true'
+      BUILDKITE_DOCKER_FILE: 'Dockerfile.test'

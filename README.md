@@ -1,5 +1,8 @@
 # ExplicitActiveRecord
 
+[![Build status](https://badge.buildkite.com/3899d0bb95a2680f73cad1df4cedc875476548d85392d47740.svg?branch=main)](https://buildkite.com/gusto/explicitactiverecord)
+
+
 If you're like a lot of Rails projects, you use `ActiveRecord`. And like a lot of other Rails projects, you probably call `save!`, `update!`, and `destroy!` on instances of your model throughout your codebase, and probably couldn't easily locate all of the places.
 
 `ExplicitActiveRecord` exists for users of `ActiveRecord` who want to use `ActiveRecord` more explicitly.
