@@ -5,3 +5,12 @@ steps:
     env:
       BUILDKITE_DOCKER: 'true'
       BUILDKITE_DOCKER_FILE: 'Dockerfile.test'
+  - wait
+  - block: ':rocket: Publish to Gem Server?'
+    branches: main
+  - name: ':ruby: Publish to Rubygems'
+    branches: main
+    agents:
+      queue: gemstash-publish
+    command: gem build explicit_activerecord.gemspec && .buildkite/store_rubygems_key.sh && gem push --key rubygems *.gem
+
