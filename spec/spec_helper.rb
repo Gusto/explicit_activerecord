@@ -4,6 +4,64 @@ require 'sqlite3'
 require 'active_record'
 require 'pry'
 
+# This allows each test to have reference to the test class without test pollution
+def define_test_classes(config)
+  config.before(:each) do
+    # https://makandracards.com/makandra/47189-rspec-how-to-define-classes-for-specs
+    test_class = Class.new(ActiveRecord::Base) do
+      has_many :other_test_classes
+    end
+
+    other_test_class = Class.new(ActiveRecord::Base)
+
+    stub_const('TestClass', test_class)
+    stub_const('OtherTestClass', other_test_class)
+  end
+end
+
+def setup_database
+  ActiveRecord::Base.establish_connection(
+    :adapter => 'sqlite3',
+    :database => ':memory:',
+  )
+
+  ActiveRecord::Schema.define do
+    create_table :test_classes do |table|
+      table.string :key
+      table.string :name
+    end
+
+    create_table :other_test_classes do |table|
+      table.string :name
+      table.references :test_class
+    end
+  end
+end
+
+def make_sorbet_signatures_noop
+  T::Configuration.call_validation_error_handler = ->(signature, opts) {
+    # Do nothing if type signatures fail in test
+  }
+end
+
+def setup_global_deprecation_helper_behavior(config)
+  config.before do
+    DeprecationHelper.configure do |helper_config|
+      helper_config.deprecation_strategies = [
+        DeprecationHelper::Strategies::LogError.new,
+        DeprecationHelper::Strategies::RaiseError.new,
+      ]
+    end
+  end
+end
+
+def teardown_database(config)
+  config.after do
+    ActiveRecord::Base.connection.execute('delete from test_classes')
+    ActiveRecord::Base.connection.execute('delete from other_test_classes')
+  end
+end
+
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
   config.example_status_persistence_file_path = '.rspec_status'
@@ -25,29 +83,11 @@ RSpec.configure do |config|
       ]
     end
   end
+
+  setup_global_deprecation_helper_behavior(config)
+  define_test_classes(config)
+  setup_database
+  make_sorbet_signatures_noop
+  teardown_database(config)
 end
 
-ActiveRecord::Base.establish_connection(
-  :adapter => 'sqlite3',
-  :database => ':memory:',
-)
-
-ActiveRecord::Schema.define do
-  create_table :my_explicit_active_record_test_classes do |table|
-    table.string :key
-  end
-
-  create_table :my_other_explicit_active_record_test_classes do |table|
-  end
-
-  create_table :my_unconfigured_explicit_active_record_test_classes do |table|
-  end
-
-  create_table :foos do |table|
-    table.string :name
-  end
-end
-
-T::Configuration.call_validation_error_handler = ->(signature, opts) {
-  # Do nothing if type signatures fail in test
-}
