@@ -2,34 +2,27 @@
 # rubocop:disable RSpec/LeakyConstantDeclaration
 # rubocop:disable Rails/ApplicationRecord
 describe ExplicitActiveRecord::Persistence do # rubocop:disable RSpec/FilePath
-  class MyExplicitActiveRecordTestClass < ActiveRecord::Base
-    include ExplicitActiveRecord::Persistence
-  end
-
-  class MyOtherExplicitActiveRecordTestClass < ActiveRecord::Base
-    include ExplicitActiveRecord::Persistence
-  end
-
-  class MyUnconfiguredExplicitActiveRecordTestClass < ActiveRecord::Base
-    include ExplicitActiveRecord::Persistence
+  before do
+    TestModel.include(ExplicitActiveRecord::Persistence)
+    OtherTestModel.include(ExplicitActiveRecord::Persistence)
   end
 
   after do
-    MyExplicitActiveRecordTestClass.dangerous_update_behaviors = []
+    TestModel.dangerous_update_behaviors = []
   end
 
   describe 'raise' do
     before do
-      MyExplicitActiveRecordTestClass.dangerous_update_behaviors = [DeprecationHelper::Strategies::RaiseError.new]
+      TestModel.dangerous_update_behaviors = [DeprecationHelper::Strategies::RaiseError.new]
     end
 
-    let(:instance) { MyExplicitActiveRecordTestClass.new }
+    let(:instance) { TestModel.new }
 
     context 'an error is thrown after permitting' do
       let(:error_message) { 'ERROR DURING PERMITTED PERSISTENCE' }
 
       subject do
-        MyExplicitActiveRecordTestClass.with_explicit_persistence_for(instance) do
+        TestModel.with_explicit_persistence_for(instance) do
           raise error_message
         end
       end
@@ -45,19 +38,19 @@ describe ExplicitActiveRecord::Persistence do # rubocop:disable RSpec/FilePath
     context 'create' do
       context 'when not permitted' do
         it 'raises when attempting to create without permission' do
-          current_count = MyExplicitActiveRecordTestClass.count
+          current_count = TestModel.count
           expect { instance.save! }.to(raise_error { |error|
             expect(error).to be_a(DeprecationHelper::DeprecationException)
-            expect(error.message).to eq('MyExplicitActiveRecordTestClass instances should only be persisted explicitly')
+            expect(error.message).to eq('TestModel instances should only be persisted explicitly')
           })
-          expect(MyExplicitActiveRecordTestClass.count).to eq current_count
+          expect(TestModel.count).to eq current_count
         end
       end
 
       context 'when permitted' do
         it 'successfully creates the record' do
-          MyExplicitActiveRecordTestClass.with_explicit_persistence_for(instance) do
-            expect { instance.save! }.to change(MyExplicitActiveRecordTestClass, :count).by(1)
+          TestModel.with_explicit_persistence_for(instance) do
+            expect { instance.save! }.to change(TestModel, :count).by(1)
           end
         end
       end
@@ -65,7 +58,7 @@ describe ExplicitActiveRecord::Persistence do # rubocop:disable RSpec/FilePath
       context 'when override is set' do
         it 'successfully creates the record' do
           instance.instance_variable_set(:@can_be_dangerously_updated, true)
-          expect { instance.save! }.to change(MyExplicitActiveRecordTestClass, :count).by(1)
+          expect { instance.save! }.to change(TestModel, :count).by(1)
         end
       end
     end
@@ -74,7 +67,7 @@ describe ExplicitActiveRecord::Persistence do # rubocop:disable RSpec/FilePath
       let(:key) { 'baz' }
 
       before do
-        MyExplicitActiveRecordTestClass.with_explicit_persistence_for(instance) do
+        TestModel.with_explicit_persistence_for(instance) do
           instance.save!
         end
       end
@@ -84,10 +77,10 @@ describe ExplicitActiveRecord::Persistence do # rubocop:disable RSpec/FilePath
           it 'raises when attempting to update' do
             expect { instance.update!(key: key) }.to(raise_error do |error|
               expect(error).to be_a(DeprecationHelper::DeprecationException)
-              expect(error.message).to eq('MyExplicitActiveRecordTestClass instances should only be persisted explicitly')
+              expect(error.message).to eq('TestModel instances should only be persisted explicitly')
             end)
 
-            MyExplicitActiveRecordTestClass.with_explicit_persistence_for(instance) do
+            TestModel.with_explicit_persistence_for(instance) do
               expect(instance.reload.key).to_not eq(key)
             end
           end
@@ -95,7 +88,7 @@ describe ExplicitActiveRecord::Persistence do # rubocop:disable RSpec/FilePath
 
         context 'when permitted' do
           it 'successfully updates the record' do
-            MyExplicitActiveRecordTestClass.with_explicit_persistence_for(instance) do
+            TestModel.with_explicit_persistence_for(instance) do
               expect { instance.update!(key: key) }.to change(instance, :key).to(key)
             end
           end
@@ -112,19 +105,19 @@ describe ExplicitActiveRecord::Persistence do # rubocop:disable RSpec/FilePath
       context 'destroy' do
         context 'when not permitted' do
           it 'raises when attempting to destroy' do
-            current_count = MyExplicitActiveRecordTestClass.count
+            current_count = TestModel.count
             expect { instance.destroy! }.to(raise_error { |error|
               expect(error).to be_a(DeprecationHelper::DeprecationException)
-              expect(error.message).to eq('MyExplicitActiveRecordTestClass instances should only be persisted explicitly')
+              expect(error.message).to eq('TestModel instances should only be persisted explicitly')
             })
-            expect(MyExplicitActiveRecordTestClass.count).to eq current_count
+            expect(TestModel.count).to eq current_count
           end
         end
 
         context 'when permitted' do
           it 'successfully destroys the record' do
-            MyExplicitActiveRecordTestClass.with_explicit_persistence_for(instance) do
-              expect { instance.destroy! }.to change(MyExplicitActiveRecordTestClass, :count).by(-1)
+            TestModel.with_explicit_persistence_for(instance) do
+              expect { instance.destroy! }.to change(TestModel, :count).by(-1)
             end
           end
         end
@@ -132,7 +125,7 @@ describe ExplicitActiveRecord::Persistence do # rubocop:disable RSpec/FilePath
         context 'when override is set' do
           it 'successfully destroys the record' do
             instance.instance_variable_set(:@can_be_dangerously_updated, true)
-            expect { instance.destroy! }.to change(MyExplicitActiveRecordTestClass, :count).by(-1)
+            expect { instance.destroy! }.to change(TestModel, :count).by(-1)
           end
         end
       end
@@ -141,22 +134,22 @@ describe ExplicitActiveRecord::Persistence do # rubocop:disable RSpec/FilePath
 
   describe 'noop strategy' do
     before do
-      MyExplicitActiveRecordTestClass.dangerous_update_behaviors = []
+      TestModel.dangerous_update_behaviors = []
     end
 
-    let(:instance) { MyExplicitActiveRecordTestClass.new }
+    let(:instance) { TestModel.new }
 
     context 'create' do
       context 'when not permitted' do
         it 'does not notify to bugsnag during the create' do
-          expect { instance.save! }.to change(MyExplicitActiveRecordTestClass, :count).by(1)
+          expect { instance.save! }.to change(TestModel, :count).by(1)
         end
       end
 
       context 'when permitted' do
         it 'successfully creates the record and does not notify to bugsnag' do
-          MyExplicitActiveRecordTestClass.with_explicit_persistence_for(instance) do
-            expect { instance.save! }.to change(MyExplicitActiveRecordTestClass, :count).by(1)
+          TestModel.with_explicit_persistence_for(instance) do
+            expect { instance.save! }.to change(TestModel, :count).by(1)
           end
         end
       end
@@ -164,7 +157,7 @@ describe ExplicitActiveRecord::Persistence do # rubocop:disable RSpec/FilePath
       context 'when override is set' do
         it 'successfully creates the record and does not notify to bugsnag' do
           instance.instance_variable_set(:@can_be_dangerously_updated, true)
-          expect { instance.save! }.to change(MyExplicitActiveRecordTestClass, :count).by(1)
+          expect { instance.save! }.to change(TestModel, :count).by(1)
         end
       end
     end
@@ -173,7 +166,7 @@ describe ExplicitActiveRecord::Persistence do # rubocop:disable RSpec/FilePath
       let(:key) { 'baz' }
 
       before do
-        MyExplicitActiveRecordTestClass.with_explicit_persistence_for(instance) do
+        TestModel.with_explicit_persistence_for(instance) do
           instance.save!
         end
       end
@@ -187,7 +180,7 @@ describe ExplicitActiveRecord::Persistence do # rubocop:disable RSpec/FilePath
 
         context 'when permitted' do
           it 'successfully updates the record' do
-            MyExplicitActiveRecordTestClass.with_explicit_persistence_for(instance) do
+            TestModel.with_explicit_persistence_for(instance) do
               expect { instance.update!(key: key) }.to change(instance, :key).to(key)
             end
           end
@@ -204,14 +197,14 @@ describe ExplicitActiveRecord::Persistence do # rubocop:disable RSpec/FilePath
       context 'destroy' do
         context 'when not permitted' do
           it 'does not notify to bugsnag during the destroy' do
-            expect { instance.destroy! }.to change(MyExplicitActiveRecordTestClass, :count).by(-1)
+            expect { instance.destroy! }.to change(TestModel, :count).by(-1)
           end
         end
 
         context 'when permitted' do
           it 'successfully destroys the record' do
-            MyExplicitActiveRecordTestClass.with_explicit_persistence_for(instance) do
-              expect { instance.destroy! }.to change(MyExplicitActiveRecordTestClass, :count).by(-1)
+            TestModel.with_explicit_persistence_for(instance) do
+              expect { instance.destroy! }.to change(TestModel, :count).by(-1)
             end
           end
         end
@@ -219,7 +212,7 @@ describe ExplicitActiveRecord::Persistence do # rubocop:disable RSpec/FilePath
         context 'when override is set' do
           it 'successfully destroys the record' do
             instance.instance_variable_set(:@can_be_dangerously_updated, true)
-            expect { instance.destroy! }.to change(MyExplicitActiveRecordTestClass, :count).by(-1)
+            expect { instance.destroy! }.to change(TestModel, :count).by(-1)
           end
         end
       end
@@ -228,30 +221,30 @@ describe ExplicitActiveRecord::Persistence do # rubocop:disable RSpec/FilePath
 
   describe 'with_explicit_persistence_for' do
     before do
-      MyExplicitActiveRecordTestClass.dangerous_update_behaviors = [DeprecationHelper::Strategies::RaiseError.new]
+      TestModel.dangerous_update_behaviors = [DeprecationHelper::Strategies::RaiseError.new]
     end
 
-    let(:instance) { MyExplicitActiveRecordTestClass.new }
-    let(:instance_2) { MyExplicitActiveRecordTestClass.new }
-    let(:instance_3) { MyExplicitActiveRecordTestClass.new }
+    let(:instance) { TestModel.new }
+    let(:instance_2) { TestModel.new }
+    let(:instance_3) { TestModel.new }
 
     it 'raise an error if the instance is not if the same class that is extending the concern' do
-      expect { MyOtherExplicitActiveRecordTestClass.with_explicit_persistence_for(instance) { instance.save! } }.to raise_error do |error|
+      expect { OtherTestModel.with_explicit_persistence_for(instance) { instance.save! } }.to raise_error do |error|
         expect(error).to be_a(ExplicitActiveRecord::Persistence::InvalidInstanceOfClassError)
-        expect(error.message).to eq('The provided instances of (MyExplicitActiveRecordTestClass) are not an instance of the class (MyOtherExplicitActiveRecordTestClass) extending this concern.')
+        expect(error.message).to eq('The provided instances of (TestModel) are not an instance of the class (OtherTestModel) extending this concern.')
       end
     end
 
     it 'raise an error if the instances are not if the same class that is extending the concern' do
-      expect { MyOtherExplicitActiveRecordTestClass.with_explicit_persistence_for([instance, instance_2]) { instance.save! } }.to raise_error do |error|
+      expect { OtherTestModel.with_explicit_persistence_for([instance, instance_2]) { instance.save! } }.to raise_error do |error|
         expect(error).to be_a(ExplicitActiveRecord::Persistence::InvalidInstanceOfClassError)
-        expect(error.message).to eq('The provided instances of (MyExplicitActiveRecordTestClass and MyExplicitActiveRecordTestClass) are not an instance of the class (MyOtherExplicitActiveRecordTestClass) extending this concern.')
+        expect(error.message).to eq('The provided instances of (TestModel and TestModel) are not an instance of the class (OtherTestModel) extending this concern.')
       end
     end
 
     context 'create' do
       it "successfully creates the record when wrapping the call within the 'with_explicit_persistence_for' block" do
-        expect { MyExplicitActiveRecordTestClass.with_explicit_persistence_for(instance) { instance.save! } }.to change(MyExplicitActiveRecordTestClass, :count).by(1)
+        expect { TestModel.with_explicit_persistence_for(instance) { instance.save! } }.to change(TestModel, :count).by(1)
       end
     end
 
@@ -259,20 +252,20 @@ describe ExplicitActiveRecord::Persistence do # rubocop:disable RSpec/FilePath
       let(:key) { 'baz' }
 
       before do
-        MyExplicitActiveRecordTestClass.with_explicit_persistence_for(instance) do
+        TestModel.with_explicit_persistence_for(instance) do
           instance.save!
         end
       end
 
       context 'update' do
         it "successfully updates the record when wrapping the call within the 'with_explicit_persistence_for' block" do
-          expect { MyExplicitActiveRecordTestClass.with_explicit_persistence_for(instance) { |_| instance.update!(key: key) } }.to change(instance, :key).to(key)
+          expect { TestModel.with_explicit_persistence_for(instance) { |_| instance.update!(key: key) } }.to change(instance, :key).to(key)
         end
       end
 
       context 'destroy' do
         it "successfully destroys the record when wrapping the call within the 'with_explicit_persistence_for' block" do
-          expect { MyExplicitActiveRecordTestClass.with_explicit_persistence_for(instance) { |_| instance.destroy! } }.to change(MyExplicitActiveRecordTestClass, :count).by(-1)
+          expect { TestModel.with_explicit_persistence_for(instance) { |_| instance.destroy! } }.to change(TestModel, :count).by(-1)
         end
       end
     end
@@ -280,21 +273,21 @@ describe ExplicitActiveRecord::Persistence do # rubocop:disable RSpec/FilePath
     context 'multiple instances' do
       it "successfully creates the records when wrapping the call within the 'with_explicit_persistence_for' block" do
         my_model_save = proc do
-          MyExplicitActiveRecordTestClass.with_explicit_persistence_for([instance, instance_2, instance_3]) do
+          TestModel.with_explicit_persistence_for([instance, instance_2, instance_3]) do
             # these are intentionally saved out of order to ensure that they can be saved out of order
             instance_3.save!
             instance.save!
             instance_2.save!
           end
         end
-        expect { my_model_save.call }.to change(MyExplicitActiveRecordTestClass, :count).by(3)
+        expect { my_model_save.call }.to change(TestModel, :count).by(3)
       end
     end
 
     context 'zero instances' do
       it 'executes the block and does not error' do
         block_was_called = false
-        MyExplicitActiveRecordTestClass.with_explicit_persistence_for(nil) do
+        TestModel.with_explicit_persistence_for(nil) do
           block_was_called = true
         end
         expect(block_was_called).to eq true
@@ -303,8 +296,8 @@ describe ExplicitActiveRecord::Persistence do # rubocop:disable RSpec/FilePath
 
     context 'nested calls for the same model' do
       subject(:persist!) do
-        MyExplicitActiveRecordTestClass.with_explicit_persistence_for(instance) do
-          MyExplicitActiveRecordTestClass.with_explicit_persistence_for(instance) do
+        TestModel.with_explicit_persistence_for(instance) do
+          TestModel.with_explicit_persistence_for(instance) do
             instance.save!
           end
           instance.save!
@@ -323,12 +316,12 @@ describe ExplicitActiveRecord::Persistence do # rubocop:disable RSpec/FilePath
         DeprecationHelper::Strategies::LogError.new,
       ]
       DeprecationHelper.configure { |config| config.deprecation_strategies = global_strategies }
-      expect(MyUnconfiguredExplicitActiveRecordTestClass.dangerous_update_behaviors).to eq global_strategies
+      expect(OtherTestModel.dangerous_update_behaviors).to eq global_strategies
 
       configured_behaviors = [DeprecationHelper::Strategies::RaiseError.new]
-      MyUnconfiguredExplicitActiveRecordTestClass.dangerous_update_behaviors = configured_behaviors
+      OtherTestModel.dangerous_update_behaviors = configured_behaviors
 
-      expect(MyUnconfiguredExplicitActiveRecordTestClass.dangerous_update_behaviors).to eq configured_behaviors
+      expect(OtherTestModel.dangerous_update_behaviors).to eq configured_behaviors
     end
   end
 end
