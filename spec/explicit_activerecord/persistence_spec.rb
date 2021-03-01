@@ -1,4 +1,4 @@
-# typed: false
+# typed: ignore
 # rubocop:disable RSpec/LeakyConstantDeclaration
 # rubocop:disable Rails/ApplicationRecord
 describe ExplicitActiveRecord::Persistence do # rubocop:disable RSpec/FilePath
