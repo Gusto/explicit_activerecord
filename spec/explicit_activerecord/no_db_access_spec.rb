@@ -6,17 +6,17 @@ module ExplicitActiveRecord
 
     describe '#no_db_access' do
       it 'allows saving' do
-        TestClass.create! name: 'george'
-        test_class = TestClass.first
-        test_class.name = 'bob'
-        test_class.save!
+        TestModel.create! name: 'george'
+        test_model = TestModel.first
+        test_model.name = 'bob'
+        test_model.save!
       end
 
       it 'prevents raw sql' do
-        TestClass.create! name: 'george'
+        TestModel.create! name: 'george'
         expect do
           no_db_access do
-            TestClass.connection.execute('select * from test_classes')
+            TestModel.connection.execute('select * from test_models')
           end
         end.to raise_error NoDBAccess::DbAccessError
       end
@@ -24,58 +24,58 @@ module ExplicitActiveRecord
       it 'prevents finding even when no record are returned' do
         expect do
           no_db_access do
-            TestClass.first
+            TestModel.first
           end
         end.to raise_error NoDBAccess::DbAccessError
       end
 
       it 'prevents plucking in a pure function' do
-        TestClass.create! name: 'george'
+        TestModel.create! name: 'george'
         expect do
           no_db_access do
-            expect(TestClass.pluck(:name)).to eq(['george'])
+            expect(TestModel.pluck(:name)).to eq(['george'])
           end
         end.to raise_error NoDBAccess::DbAccessError
       end
 
       it 'prevents dynamic finds in a pure function' do
-        TestClass.create! name: 'george'
+        TestModel.create! name: 'george'
         expect do
           no_db_access do
-            expect(TestClass.find_by_name('george')).to eq TestClass.first
+            expect(TestModel.find_by_name('george')).to eq TestModel.first
           end
         end.to raise_error NoDBAccess::DbAccessError
       end
 
       it 'prevents joins in a pure function' do
-        test_class = TestClass.create!
-        5.times { OtherTestClass.create!(test_class_id: test_class.id) }
+        test_model = TestModel.create!
+        5.times { OtherTestModel.create!(test_model_id: test_model.id) }
         expect do
           no_db_access do
-            expect(TestClass.joins(:other_test_classes).uniq).to eq([TestClass.first])
+            expect(TestModel.joins(:other_test_models).uniq).to eq([TestModel.first])
           end
         end.to raise_error NoDBAccess::DbAccessError
       end
 
       it 'prevents finding in a pure function' do
-        TestClass.create! name: 'george'
+        TestModel.create! name: 'george'
         expect do
           no_db_access do
-            TestClass.first
+            TestModel.first
           end
         end.to raise_error NoDBAccess::DbAccessError
       end
 
       it 'prevents saving in a pure function' do
-        test_class = TestClass.create! name: 'george'
+        test_model = TestModel.create! name: 'george'
         puts 'point 1'
         no_db_access do
-          test_class.name = 'bob'
+          test_model.name = 'bob'
         end
         expect do
           puts 'point 2'
           no_db_access do
-            test_class.save!
+            test_model.save!
           end
         end.to raise_error NoDBAccess::DbAccessError
       end
@@ -83,16 +83,16 @@ module ExplicitActiveRecord
       it 'prevents creating in a pure function' do
         expect do
           no_db_access do
-            TestClass.create! name: 'stuff'
+            TestModel.create! name: 'stuff'
           end
         end.to raise_error NoDBAccess::DbAccessError
       end
 
       it 'prevents destroying in a pure function' do
-        test_class = TestClass.create! name: 'stuff'
+        test_model = TestModel.create! name: 'stuff'
         expect do
           no_db_access do
-            test_class.destroy
+            test_model.destroy
           end
         end.to raise_error NoDBAccess::DbAccessError
       end

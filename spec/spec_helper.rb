@@ -5,17 +5,17 @@ require 'active_record'
 require 'pry'
 
 # This allows each test to have reference to the test class without test pollution
-def define_test_classes(config)
+def define_test_models(config)
   config.before(:each) do
     # https://makandracards.com/makandra/47189-rspec-how-to-define-classes-for-specs
-    test_class = Class.new(ActiveRecord::Base) do
-      has_many :other_test_classes
+    test_model = Class.new(ActiveRecord::Base) do
+      has_many :other_test_models
     end
 
-    other_test_class = Class.new(ActiveRecord::Base)
+    other_test_model = Class.new(ActiveRecord::Base)
 
-    stub_const('TestClass', test_class)
-    stub_const('OtherTestClass', other_test_class)
+    stub_const('TestModel', test_model)
+    stub_const('OtherTestModel', other_test_model)
   end
 end
 
@@ -26,14 +26,14 @@ def setup_database
   )
 
   ActiveRecord::Schema.define do
-    create_table :test_classes do |table|
+    create_table :test_models do |table|
       table.string :key
       table.string :name
     end
 
-    create_table :other_test_classes do |table|
+    create_table :other_test_models do |table|
       table.string :name
-      table.references :test_class
+      table.references :test_model
     end
   end
 end
@@ -57,8 +57,8 @@ end
 
 def teardown_database(config)
   config.after do
-    ActiveRecord::Base.connection.execute('delete from test_classes')
-    ActiveRecord::Base.connection.execute('delete from other_test_classes')
+    ActiveRecord::Base.connection.execute('delete from test_models')
+    ActiveRecord::Base.connection.execute('delete from other_test_models')
   end
 end
 
@@ -85,7 +85,7 @@ RSpec.configure do |config|
   end
 
   setup_global_deprecation_helper_behavior(config)
-  define_test_classes(config)
+  define_test_models(config)
   setup_database
   make_sorbet_signatures_noop
   teardown_database(config)
