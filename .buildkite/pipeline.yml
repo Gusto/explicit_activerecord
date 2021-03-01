@@ -5,6 +5,12 @@ steps:
     env:
       BUILDKITE_DOCKER: 'true'
       BUILDKITE_DOCKER_FILE: 'Dockerfile.test'
+  - name: ':sorbet: Sorbet typecheck'
+    command: typecheck.sh
+    timeout_in_minutes: 10
+    env:
+      BUILDKITE_DOCKER: 'true'
+      BUILDKITE_DOCKER_FILE: 'Dockerfile.test'
   - wait
   - block: ':rocket: Publish to Gem Server?'
     branches: main
