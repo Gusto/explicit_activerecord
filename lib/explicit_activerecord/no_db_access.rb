@@ -1,4 +1,4 @@
-# typed: false
+# typed: true
 
 # this is meant to allow callers to write code like this:
 #   model = MyModel.find

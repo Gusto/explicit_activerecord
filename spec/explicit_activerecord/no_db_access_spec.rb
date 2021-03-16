@@ -1,4 +1,4 @@
-# typed: false
+# typed: ignore
 
 module ExplicitActiveRecord
   describe NoDBAccess do

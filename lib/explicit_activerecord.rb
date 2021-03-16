@@ -1,3 +1,4 @@
+# typed: strict
 require 'sorbet-runtime'
 require 'active_support/concern'
 require 'deprecation_helper'

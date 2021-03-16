@@ -1,3 +1,4 @@
+# typed: false
 require 'bundler/setup'
 require 'explicit_activerecord'
 require 'sqlite3'
