@@ -46,10 +46,10 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.10.0)
     rspec-support (3.10.2)
-    sorbet (0.5.6295)
-      sorbet-static (= 0.5.6295)
+    sorbet (0.5.6389)
+      sorbet-static (= 0.5.6389)
     sorbet-runtime (0.5.6295)
-    sorbet-static (0.5.6295-universal-darwin-14)
+    sorbet-static (0.5.6389-universal-darwin-14)
     sqlite3 (1.4.2)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
@@ -62,7 +62,7 @@ DEPENDENCIES
   explicit_activerecord!
   pry
   rspec (~> 3.0)
-  sorbet (~> 0.5.6293)
+  sorbet (~> 0.5.6389)
   sqlite3
 
 BUNDLED WITH
