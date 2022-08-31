@@ -166,3 +166,42 @@ Furthermore, I recommend not returning instances of `MyModel` when a call is mad
 Another way to implement this idea using native Rails is by using [Multiple Databases with Active Record](https://guides.rubyonrails.org/active_record_multiple_databases.html). For example, for NoDbAccess, you can simply set up a null database in your application, and switch to it within your block.
 
 The reason this gem exists is because if your Rails project is like the ones I've seen, you are not doing this from the start. `ExplicitActiveRecord` is *not* a substitute for Ruby primitives like `private_constant` and conceptual primitives like value objects. Those primitives are the end goal, and this gem is just meant to provide a safe and incremental way to get you there.
+
+## ExplicitActiveRecord::TransactionGuard 
+
+Prevent your method from being called while within a database transaction.
+
+By explicitly requiring no (disallowed) open transactions when your method is called, you can confidently perform non-atomic operations,
+such as making an HTTP request to a third party, scheduling a background job via Redis, etc.
+
+This may also help in preventing long running transactions that include row-level locking by forcing engineers to be more deliberate about transaction use.
+
+### Usage
+
+```ruby
+class MyService
+  include ExplicitActiveRecord::TransactionGuard
+
+  def my_non_atomic_method(args)
+    ensure_transaction_integrity! # raises if called within in an unwanted transaction
+    SidekiqWorker.perform_async(args)
+  end
+
+  private
+
+  def trust_me_im_not_in_a_transaction(args)
+    allow_transaction do
+      my_non_atomic_method(args)
+    end
+  end
+end
+
+class Consumer
+  def method
+    MyService.new.my_non_atomic_method(true) # does not raise
+    Model.transaction(requires_new: true, joinable: false) do
+      MyService.new.my_non_atomic_method(true) # raises!
+    end
+  end
+end
+```
