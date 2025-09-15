@@ -28,7 +28,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'pry'
   spec.add_development_dependency 'rspec', '~> 3.0'
   spec.add_development_dependency 'sorbet'
-
-  # This allows us to test ActiveRecord business logic without needing an underlying database
+  # This allows us to test ActiveRecord business logic without needing an underlying database:
   spec.add_development_dependency 'sqlite3'
+  spec.add_development_dependency 'tapioca'
 end
