@@ -45,7 +45,7 @@ Once your model is configured correctly to use `ExplicitActiveRecord::Persistenc
 ### Incremental
 `ExplicitActiveRecord::Persistence` is *incremental*. This means that you can include `ExplicitActiveRecord::Persistence`, and specify a *non-raising* behavior when the model is persisted implicitly, and use your logs or bug tracking system to find places where the model is implicitly raising, without breaking production. [See the `README` for `deprecation_helper` for more information on this](https://github.com/Gusto/deprecation_helper/blob/main/README.md).
 
-### Usage 
+### Usage
 The first step is to `include ExplicitActiveRecord::Persistence` in your models:
 
 Secondly, you'll need to configure `dangerous_update_behaviors` (see the `deprecation_helper` gem for more info).
@@ -91,7 +91,7 @@ Note that you cannot pass in a relation to `with_explicit_persistence_for` — o
 It is *not* recommended to use this dynamically, such as:
 ```ruby
 # Don't do this!
-self.class.with_explicit_persistence_forinstance) do
+self.class.with_explicit_persistence_for(instance) do
   instance.save!
 end
 ```
@@ -102,23 +102,23 @@ You can specify multiple behaviors to invoke when the model is updated implicitl
 
 Note that by default, `ExplicitActiveRecord` uses the global configuration for `DeprecationHelper`. If your project has already configured `DeprecationHelper`, using:
 ```ruby
-DeprecationHelper.configure { |config| config.deprecation_strategies = [...] })
+DeprecationHelper.configure { |config| config.deprecation_strategies = [...] }
 ```
 then `ExplicitActiveRecord` will use the global configuration.
 
 ### How it works
-When a client calls `my_model.save!` or `my_model.update!` without using the explicit persistence wrapper, `ExplicitActiveRecord::Persistence` will invoke `DeprecationHelper` with whatever deprecation strategies your model is configured with. 
+When a client calls `my_model.save!` or `my_model.update!` without using the explicit persistence wrapper, `ExplicitActiveRecord::Persistence` will invoke `DeprecationHelper` with whatever deprecation strategies your model is configured with.
 
 
-## ExplicitActiveRecord::NoDbAccess 
+## ExplicitActiveRecord::NoDbAccess
 `ExplicitActiveRecord::NoDbAccess` has a single public method to restrict the use of the database.
 
-Once your class or module is configured correctly to use `ExplicitActiveRecord::NoDbAccess`, you will not be able to use the database within the `no_db_access` block. 
+Once your class or module is configured correctly to use `ExplicitActiveRecord::NoDbAccess`, you will not be able to use the database within the `no_db_access` block.
 
 ### Incremental
 Note that unlike `ExplicitActiveRecord::Persistence`, `ExplicitActiveRecord::NoDbAccess` is NOT *incremental*. This means that using the DB within one of these blocks *will raise*. If you're interested in allowing `no_db_access` to behave like `Persistence`, please file an issue. It is recommended to use `NoDbAccess` in new code where you are very confident your code should not be using the DB.
 
-### Usage 
+### Usage
 The first step is to `include ExplicitActiveRecord::NoDbAccess` in your module or class.
 
 Then, you can use the `no_db_access` block.
@@ -127,7 +127,7 @@ All together, this looks like this:
 ```ruby
 class MyClass # can also be a module
   include ExplicitActiveRecord::NoDbAccess
-  
+
   # Class method
   def self.my_method
     no_db_access do
