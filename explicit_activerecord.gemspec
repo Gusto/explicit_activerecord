@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'sorbet-runtime', '~> 0.5.6293'
+  spec.add_dependency 'sorbet-runtime', '>= 0.5.6293'
 
   # This dependency powers the behavior for ExplicitActiveRecord
   spec.add_dependency 'deprecation_helper'
@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency 'pry'
   spec.add_development_dependency 'rspec', '~> 3.0'
-  spec.add_development_dependency 'sorbet', '~> 0.5.6389'
+  spec.add_development_dependency 'sorbet'
 
   # This allows us to test ActiveRecord business logic without needing an underlying database
   spec.add_development_dependency 'sqlite3'
