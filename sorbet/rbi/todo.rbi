@@ -4,17 +4,13 @@
 
 # typed: false
 
-module ::Anonymous_Delegator_10; end
-module ::Anonymous_Delegator_6; end
-module ::Anonymous_Delegator_7; end
-module ::Anonymous_Delegator_8; end
-module ::Anonymous_Delegator_9; end
-module ::Rails::Generators::NamedBase; end
-module ActiveRecord::Generators::Migration::Rails::Generators::Migration; end
-module ActiveRecord::Persistence::ActionController::Parameters; end
-module Rake::DSL; end
-module T::InterfaceWrapper::Helpers; end
-module T::Private::Abstract::Hooks; end
-module T::Private::Methods::MethodHooks; end
-module T::Private::Methods::SingletonMethodHooks; end
-module URI::Escape; end
+module ::DateAndTime::Calculations; end
+module ::DateAndTime::Zones; end
+module ActiveModel::Error; end
+module ActiveRecord::ConnectionAdapters::DatabaseStatements; end
+module ActiveRecord::ConnectionAdapters::SchemaStatements; end
+module ActiveSupport::ArrayInquirer; end
+module ActiveSupport::Multibyte::Chars; end
+module ActiveSupport::SafeBuffer; end
+module ActiveSupport::StringInquirer; end
+module ActiveSupport::TimeZone; end
