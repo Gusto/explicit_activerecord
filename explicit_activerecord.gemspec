@@ -3,11 +3,15 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name          = 'explicit_activerecord'
-  spec.version       = '0.1.1'
+  spec.version       = '0.2.0'
   spec.authors       = ['Alex Evanczuk']
   spec.email         = ['alex.evanczuk@gusto.com']
 
   spec.summary       = 'This is a gem for using ActiveRecord more explicitly.'
+  spec.homepage      = 'https://github.com/Gusto/explicit_activerecord'
+  spec.license       = 'MIT'
+
+  spec.required_ruby_version = '>= 3.0'
 
   # Specify which files should be added to the gem when it is released.
   spec.files         = Dir["LICENSE", "README.md", "lib/**/*"]

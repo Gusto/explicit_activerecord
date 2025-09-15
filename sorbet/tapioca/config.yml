@@ -1,10 +1,35 @@
 gem:
-  # Add your `gem` command parameters here:
-  #
-  # exclude:
-  # - gem_name
-  # doc: true
-  # workers: 5
+  exclude:
+    # The following are stdlib gems that are bundled with sorbet. We exclude them to avoid
+    #   overwriting the bundled versions with tapioca's untyped shims.
+    - base64
+    - benchmark
+    - bigdecimal
+    - cgi
+    - csv
+    - date
+    - drb
+    - json
+    - logger
+    - matrix
+    - msgpack # not stdlib, but bundled with sorbet
+    - mutex_m
+    - nkf
+    - pp
+    - pstore
+    - psych
+    - racc
+    - rdoc
+    - reline
+    - rexml
+    - securerandom
+    - set
+    - stringio
+    - time
+    - timeout
+    - uri
+    - webrick
+    - zlib
 dsl:
   # Add your `dsl` command parameters here:
   #
