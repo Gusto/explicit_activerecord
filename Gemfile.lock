@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    explicit_activerecord (0.1.1)
+    explicit_activerecord (0.2.0)
       activerecord
       activesupport
       deprecation_helper
