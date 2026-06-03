@@ -1,6 +1,6 @@
 steps:
   - name: ':rspec: RSpec'
-    command: test.sh
+    command: ./test.sh
     timeout_in_minutes: 10
     plugins:
       - ssh://git@github.com/Gusto/cloudsmith-auth-buildkite-plugin.git#v2.2.0: ~
@@ -11,7 +11,7 @@ steps:
             - BUNDLE_DL__CLOUDSMITH__IO
             - CLOUDSMITH_API_KEY
   - name: ':sorbet: Sorbet typecheck'
-    command: typecheck.sh
+    command: ./typecheck.sh
     timeout_in_minutes: 10
     plugins:
       - ssh://git@github.com/Gusto/cloudsmith-auth-buildkite-plugin.git#v2.2.0: ~
