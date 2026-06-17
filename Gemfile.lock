@@ -8,7 +8,7 @@ PATH
       sorbet-runtime (>= 0.5.6293)
 
 GEM
-  remote: https://rubygems.org/
+  remote: https://dl.cloudsmith.io/basic/gusto/gusto/ruby/
   specs:
     activemodel (8.0.2.1)
       activesupport (= 8.0.2.1)
