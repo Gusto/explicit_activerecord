@@ -1,0 +1,12 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: explicit_activerecord
+  description: This gem helps you use ActiveRecord more explicitly.
+  annotations:
+    github.com/project-slug: gusto/explicit_activerecord
+    buildkite.com/project-slug: gusto/explicitactiverecord
+spec:
+  type: library
+  owner: team-product-infrastructure-modularity
+  lifecycle: stable
