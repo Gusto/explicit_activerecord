@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.10.0
 FROM ruby:3.4.5
 
 # Setup the buildkite-agent user/group
@@ -9,11 +10,10 @@ RUN groupadd -r buildkite-agent && \
 ENV APP_HOME /var/www
 WORKDIR $APP_HOME
 
-# Setup bundler options to install gems in the work directory and use our gem mirror
+# Setup bundler options to install gems in the work directory
 RUN gem install bundler && \
       bundle config --local app_config /usr/local/bundle/config && \
       bundle config --local path vendor/bundle && \
-      bundle config --local "mirror.https://rubygems.org" "https://gemstash.zp-int.com" && \
       mkdir /home/buildkite-agent/.gem # This is needed for publishing gems from inside your container
 
 # RAILS APP: Add Gemfile and Gemfile.lock to the work directory
@@ -22,8 +22,10 @@ COPY Gemfile* $APP_HOME/
 # LIBRARY: Add Gemfile, Gemfile.lock, and gemspec to the work directory
 COPY Gemfile* explicit_activerecord.gemspec $APP_HOME/
 
-# Run bundle install with minimal dependencies
-RUN bundle install
+# Run bundle install with Cloudsmith credentials
+RUN --mount=type=secret,id=cloudsmith_api_key,env=CLOUDSMITH_API_KEY \
+      BUNDLE_DL__CLOUDSMITH__IO="token:${CLOUDSMITH_API_KEY}" \
+      bundle install
 
 # Add the rest of the source, now that dependencies are installed
 COPY . $APP_HOME
