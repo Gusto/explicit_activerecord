@@ -8,5 +8,5 @@ metadata:
     buildkite.com/project-slug: gusto/explicitactiverecord
 spec:
   type: library
-  owner: team-product-infrastructure-modularity
+  owner: team-developer-productivity-rails
   lifecycle: stable
