@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.10.0
-FROM 981889560161.dkr.ecr.us-west-2.amazonaws.com/library/ruby:3.4.5
+FROM ruby:3.4.5
 
 # Setup the buildkite-agent user/group
 RUN groupadd -r buildkite-agent && \
